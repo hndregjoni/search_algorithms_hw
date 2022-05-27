@@ -1,24 +1,21 @@
 from collections import deque
 from io import TextIOWrapper
 from itertools import chain
-from typing import Iterator, List, ClassVar, Optional, Deque
+from typing import Iterator, List, ClassVar, Optional, Deque, Type, Union, Any
 from copy import deepcopy
 
-from common.state import State
+from common.state import State, TGoal
 
 FlipArray = List[List[bool]]
 
 class FlipState(State[FlipArray]):
     """ The class representing the state. Actual state is stored in _state """
-    _state: ClassVar['FlipArray']
-    expanded: ClassVar[bool] = False
-    label: ClassVar[str]
-    last: ClassVar['FlipState']
+    last: Optional['FlipState']
 
-    w: ClassVar[int]
-    h: ClassVar[int]
+    w: int
+    h: int
 
-    def __init__(self, array: FlipArray, label: str = "", last: 'FlipState' = None) -> None:
+    def __init__(self, array: FlipArray, label: str = "", last: Optional['FlipState'] = None) -> None:
         self._state = array
         self.label = label
         self.last = last
@@ -35,9 +32,13 @@ class FlipState(State[FlipArray]):
 
                 yield new_state
     
-    def is_terminal(self, goal: 'FlipState') -> bool:
+    def is_terminal(self, goal: TGoal = None) -> bool:
         """ Check whether current state is terminal """
-        return self == goal
+
+        if goal is not None:
+            return self == goal
+        
+        return False
     
     def copy(self, new_label: str) -> 'FlipState':
         return FlipState(deepcopy(self._state), label=new_label, last=self)
@@ -78,7 +79,7 @@ class FlipState(State[FlipArray]):
         
         return res
     
-    def __eq__(self, __o: 'FlipState') -> bool:
+    def __eq__(self, __o: Any) -> bool:
         return self._state == __o._state
 
 # Define the goal, a bit hacky
@@ -101,7 +102,7 @@ def read_from_open_file(f: TextIOWrapper) -> FlipState:
 def read_from_file(path: str = "input.txt") -> FlipState:
     return read_from_open_file(open(path))
     
-def print_backwards(state: FlipState) -> None:
+def print_backwards(state: Optional[FlipState]) -> None:
     if state is None:
         return
     
