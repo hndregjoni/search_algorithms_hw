@@ -1,11 +1,14 @@
 from collections import deque
+from io import TextIOWrapper
 from itertools import chain
 from typing import Iterator, List, ClassVar, Optional, Deque
 from copy import deepcopy
 
+from common.state import State
+
 FlipArray = List[List[bool]]
 
-class FlipState:
+class FlipState(State[FlipArray]):
     """ The class representing the state. Actual state is stored in _state """
     _state: ClassVar['FlipArray']
     expanded: ClassVar[bool] = False
@@ -79,54 +82,10 @@ class FlipState:
         return self._state == __o._state
 
 # Define the goal, a bit hacky
-goal = FlipState([[True]*3]*3, label = 'G')
 
-class BFSolver:
-    initial: ClassVar[FlipState]
-    _queue: ClassVar[Deque[FlipState]]
-    _expanded_list: ClassVar[List[FlipState]]
-    already_run: ClassVar[bool] = False
-    solution: ClassVar[Optional[FlipState]] = None
-
-    def __init__(self, initial: FlipState):
-        self._queue = deque()
-        self._expanded_list = []
-        self.initial = initial
-
-    def solve(self) -> Optional[FlipState]:
-        assert self.already_run == False
-        self.already_run = True
-
-        # Add the initial state to the queue:
-        self._queue.append(self.initial)
-
-        # Start dequeueing:
-        while len(self._queue) > 0:
-            # Get item from queue:
-            curr = self._queue.popleft()
-
-            # Check if not in expanded:
-            if curr in self._expanded_list:
-                continue
-
-            # Check if it is terminal
-            if curr.is_terminal(goal=goal):
-                self.solution = curr
-                self._expanded_list.append(curr)
-                break
-            
-            # If not terminal, enqueue children:
-            self._expanded_list.append(curr)
-
-            for succ in curr.successor():
-                if succ not in self._queue:
-                    self._queue.append(succ)
-
-        return self.solution
-
-def read_from_file(path: str = "input.txt") -> FlipState:
+def read_from_open_file(f: TextIOWrapper) -> FlipState:
     stateArr: FlipArray = []
-    with open(path) as f:
+    with f:
         lines = f.readlines()
         for line in lines:
             stateArr.append([])
@@ -138,22 +97,13 @@ def read_from_file(path: str = "input.txt") -> FlipState:
     
     return FlipState(stateArr, label='S')
 
+
+def read_from_file(path: str = "input.txt") -> FlipState:
+    return read_from_open_file(open(path))
+    
 def print_backwards(state: FlipState) -> None:
     if state is None:
         return
     
     print(state)
     print_backwards(state.last)
-
-if __name__ == "__main__":
-    initial = read_from_file()
-
-    solver = BFSolver(initial)
-
-    # print(initial)
-    # initial.flip(1, 0)
-    # print(initial)
-
-    result = solver.solve()
-
-    print_backwards(result)
