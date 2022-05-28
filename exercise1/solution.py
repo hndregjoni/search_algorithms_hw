@@ -2,23 +2,15 @@ from io import TextIOWrapper
 from typing import Iterator, List, ClassVar, Optional, Deque, Type, Union, Any
 from copy import deepcopy
 
-from common.state import State
+from common.state import GridState, TGrid
+from common.read_util import lines_to_int_grid
 
 FlipArray = List[List[bool]]
 
-class FlipState(State[FlipArray]):
+class FlipState(GridState[int]):
     """ The class representing the state. Actual state is stored in _state """
     last: Optional['FlipState']
-
-    w: int
-    h: int
-
-    def __init__(self, array: FlipArray, label: str = "", last: Optional['FlipState'] = None) -> None:
-        super().__init__(array, label, last)
-        
-        self.w = len(self._state)
-        self.h = len(self._state[0])
-    
+ 
     def successor(self) -> Iterator['FlipState']:
         """ The successor states """
         for i in range(self.w):
@@ -27,10 +19,10 @@ class FlipState(State[FlipArray]):
                 new_state.flip(i, j)
 
                 yield new_state
-     
+
     def copy(self, new_label: str) -> 'FlipState':
         return FlipState(deepcopy(self._state), label=new_label, last=self)
-    
+     
     def flip(self, i: int, j: int):
         """ Flip around (i,j) """
         self._state[i][j] = not self._state[i][j]
@@ -47,40 +39,12 @@ class FlipState(State[FlipArray]):
         if self.w > i-1 >= 0:
             self._state[i-1][j] = not self._state[i-1][j]
 
-    def __repr__(self):
-        res = f""
-
-        l = len(self.label)
-        label_line = (self.label + " => ").rjust(l+4)
-        empty_line = ' ' * (l+4)
-
-        for line_num in range(self.h):
-            if line_num == self.h//2:
-                res += label_line
-            else:
-                res += empty_line
-            
-            for col_num in range(self.w):
-                res += f"{'1' if self._state[col_num][line_num] else '0'} "
-            
-            res += "\n"
-        
-        return res
-    
-    def __eq__(self, __o: Any) -> bool:
-        return self._state == __o._state
 
 def read_from_open_file(f: TextIOWrapper) -> FlipState:
-    stateArr: FlipArray = []
+    stateArr: TGrid[int] = []
     with f:
         lines = f.readlines()
-        for line in lines:
-            stateArr.append([])
-            for fl in line.strip().split():
-                stateArr[-1].append(fl == '1')
-    
-    # Transpose:
-    stateArr = list(map(list, zip(*stateArr)))
+        stateArr = lines_to_int_grid(lines) 
     
     return FlipState(stateArr, label='S')
 

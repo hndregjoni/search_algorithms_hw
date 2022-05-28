@@ -47,4 +47,38 @@ class State(Generic[TInnerState]):
         return False
     
     def copy(self: TState, new_label: str) -> 'TState':
-        pass 
+        pass
+
+
+TGridStateCell = TypeVar('TGridStateCell')
+TGrid = List[List[TGridStateCell]]
+
+class GridState(Generic[TGridStateCell], State[TGrid[TGridStateCell]]):
+    def __init__(self, array: TGrid, label: str = "", last: Optional['GridState'] = None) -> None:
+        super().__init__(array, label, last)
+        
+        self.w = len(self._state)
+        self.h = len(self._state[0])
+
+    def __repr__(self):
+        res = f""
+
+        l = len(self.label)
+        label_line = (self.label + " => ").rjust(l+4)
+        empty_line = ' ' * (l+4)
+
+        for line_num in range(self.h):
+            if line_num == self.h//2:
+                res += label_line
+            else:
+                res += empty_line
+            
+            for col_num in range(self.w):
+                res += f"{'1' if self._state[col_num][line_num] else '0'} "
+            
+            res += "\n"
+        
+        return res
+    
+    def __eq__(self, __o: Any) -> bool:
+        return self._state == __o._state
