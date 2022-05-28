@@ -1,10 +1,8 @@
-from collections import deque
 from io import TextIOWrapper
-from itertools import chain
 from typing import Iterator, List, ClassVar, Optional, Deque, Type, Union, Any
 from copy import deepcopy
 
-from common.state import State, TGoal
+from common.state import State
 
 FlipArray = List[List[bool]]
 
@@ -29,15 +27,7 @@ class FlipState(State[FlipArray]):
                 new_state.flip(i, j)
 
                 yield new_state
-    
-    def is_terminal(self, goal: TGoal = None) -> bool:
-        """ Check whether current state is terminal """
-
-        if goal is not None:
-            return self == goal
-        
-        return False
-    
+     
     def copy(self, new_label: str) -> 'FlipState':
         return FlipState(deepcopy(self._state), label=new_label, last=self)
     
@@ -79,8 +69,6 @@ class FlipState(State[FlipArray]):
     
     def __eq__(self, __o: Any) -> bool:
         return self._state == __o._state
-
-# Define the goal, a bit hacky
 
 def read_from_open_file(f: TextIOWrapper) -> FlipState:
     stateArr: FlipArray = []

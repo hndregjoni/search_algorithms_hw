@@ -10,8 +10,8 @@ def exercise1(argv: List[str]):
     initial = read_from_file("exercise1/input.txt")
 
     g = lambda s: s.last.cost + 1 if s.last is not None else s.cost
-    # solver = UniformCostSolver(initial, goal, g)
-    solver = Solver(initial, goal, QueueFrontier())
+    solver = UniformCostSolver(initial, goal, g)
+    # solver = Solver(initial, goal, QueueFrontier())
 
     result = solver.solve()
 
