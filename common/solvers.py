@@ -1,49 +1,52 @@
-from typing import ClassVar, Generic, Optional, Deque, List, Type
+from typing import ClassVar, Generic, Optional, Deque, List, Type, Any
 from collections import deque
 
 from .state import TState, TGoal, State
-# from .frontiers import TFrontier
+from .frontiers import TFrontier, Frontier
 
-# class Solver(Generic[TState, TFrontier]):
-#     _frontier: ClassVar[TFrontier]
-#     already_run: bool = False
+class Solver(Generic[TState]):
+    _frontier: Frontier[TState, Any]
+    already_run: bool = False
 
-#     def __init__(self, initial: TState, goal: TGoal, frontier: TFrontier) -> None:
-#         self._frontier = frontier
+    def __init__(self, initial: TState, goal: TGoal, frontier: Frontier[TState, Any]) -> None:
+        self._frontier = frontier
 
-#         self.initial = initial
-#         self.goal = goal
+        self.initial = initial
+        self.goal = goal
     
-#     def solve(self) -> Optional[TState]:
-#         assert self.already_run == False
-#         self.already_run = True
+    def solve(self) -> Optional[TState]:
+        assert self.already_run == False
+        self.already_run = True
 
-#         # Add the initial state to the queue:
-#         self._frontier.add_to_frontier(self.initial)
+        # Add the initial state to the queue:
+        self._frontier.add_to_frontier(self.initial)
 
-#         # Start dequeueing:
-#         while len(self._queue) > 0:
-#             # Get item from queue:
-#             curr = self._queue.popleft()
+        # Start dequeueing:
+        while len(self._frontier) > 0:
+            # Get item from queue:
+            curr = self._frontier.peek_frontier()
 
-#             # Check if not in expanded:
-#             if curr in self._expanded_list:
-#                 continue
+            # Check if not in expanded:
+            if self._frontier.been_expanded(curr):
+                self._frontier.remove_from_frontier(curr)
+                continue
 
-#             # Check if it is terminal
-#             if curr.is_terminal(goal=self.goal):
-#                 self.solution = curr
-#                 self._expanded_list.append(curr)
-#                 break
+            # Check if it is terminal
+            if curr.is_terminal(goal=self.goal):
+                self.solution = curr
+                self._frontier.add_to_expanded(curr)
+                break
             
-#             # If not terminal, enqueue children:
-#             self._expanded_list.append(curr)
+            # If not terminal, enqueue children:
+            self._frontier.add_to_expanded(curr)
 
-#             for succ in curr.successor():
-#                 if succ not in self._queue:
-#                     self._queue.append(succ)
+            for succ in curr.successor():
+                if not self._frontier.been_expanded(succ):
+                    self._frontier.add_to_frontier(succ)
+            
+            self._frontier.remove_from_frontier(curr)
 
-#         return self.solution
+        return self.solution
 
 class BFSolver(Generic[TState]):
     initial: TState
