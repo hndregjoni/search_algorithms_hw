@@ -1,5 +1,6 @@
-from typing import Generic, Collection, TypeVar, ClassVar, List, Deque, Optional, Type, Any, Deque
+from typing import Generic, Collection, TypeVar, ClassVar, List, Deque, Optional, Type, Any, Deque, Callable, Tuple
 from collections import deque
+import heapq
 
 from .state import TState, State
 
@@ -52,9 +53,39 @@ class QueueFrontier(Generic[TState], Frontier[TState, Deque[TState]]):
         self._frontierColl.popleft()
         
 
-class PriorityQueueFrontier:
-    def __init__(self):
-        pass
+zero = lambda _: 0
+
+class PriorityQueeFrontier(Generic[TState], Frontier[TState, List[TState]]):
+    # f: Callable[[TState], int]
+    # g: Callable[[TState], int]
+    def __init__(self, g: Callable[[TState], int], h: Callable[[TState], int]):
+        super().__init__(list())
+
+        self.g = g
+        self.h = h
+    
+    def add_to_frontier(self, state: TState):
+        state.cost = self.g(state) + self.h(state)
+
+        heapq.heappush(self._frontierColl, state)
+
+    def peek_frontier(self) -> TState:
+        return self._frontierColl[0]
+    
+    def remove_from_frontier(self, state: Optional[TState] = None) -> None:
+        # Simply pop
+        if state is not None:
+            k: int
+            found: int
+            v: TState
+            for k, v in enumerate(self._frontierColl): 
+                if v is state:
+                    found = k
+            
+            del self._frontierColl[found]
+
+            heapq.heapify(self._frontierColl)
+        
 
 class StackFrontier(Generic[TState], Frontier[TState, Deque[TState]]):
     def __init__(self):

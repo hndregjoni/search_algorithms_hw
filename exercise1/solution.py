@@ -16,9 +16,7 @@ class FlipState(State[FlipArray]):
     h: int
 
     def __init__(self, array: FlipArray, label: str = "", last: Optional['FlipState'] = None) -> None:
-        self._state = array
-        self.label = label
-        self.last = last
+        super().__init__(array, label, last)
         
         self.w = len(self._state)
         self.h = len(self._state[0])

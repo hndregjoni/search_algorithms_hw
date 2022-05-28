@@ -1,8 +1,8 @@
-from typing import ClassVar, Generic, Optional, Deque, List, Type, Any
+from typing import ClassVar, Generic, Optional, Deque, List, Type, Any, Callable
 from collections import deque
 
 from .state import TState, TGoal, State
-from .frontiers import TFrontier, Frontier
+from .frontiers import PriorityQueeFrontier, QueueFrontier, StackFrontier, TFrontier, Frontier, zero
 
 class Solver(Generic[TState]):
     _frontier: Frontier[TState, Any]
@@ -48,47 +48,77 @@ class Solver(Generic[TState]):
 
         return self.solution
 
-class BFSolver(Generic[TState]):
-    initial: TState
-    _queue: Deque[TState]
-    _expanded_list: List[TState]
-    goal: TGoal
-    already_run: bool = False
-    solution: Optional[TState] = None
+class AStarSolver(Generic[TState], Solver[TState]):
+    """ A generic solving scheme, with g and h that make up f. """
+    def __init__(self, initial: TState, goal: TGoal, g: Callable[[TState], int], h: Callable[[TState], int]) -> None:
+        frontier = PriorityQueeFrontier(g, h)
 
+        super().__init__(initial, goal, frontier)
+
+class UniformCostSolver(Generic[TState], AStarSolver[TState]):
+    """ If h = 0, we have a general Uniform Cost search, a sort of implementation of Djikstra's """
+    def __init__(self, initial: TState, goal: TGoal, g: Callable[[TState], int]) -> None:
+        super().__init__(initial, goal, g, zero)
+
+class BFSolver(Generic[TState], Solver[TState]):
+    """ Here we have a BFS solver """
     def __init__(self, initial: TState, goal: TGoal) -> None:
-        self._queue = deque()
-        self._expanded_list = []
-        self.initial = initial
-        self.goal = goal
+        frontier: Frontier = QueueFrontier()
 
-    def solve(self) -> Optional[TState]:
-        assert self.already_run == False
-        self.already_run = True
+        super().__init__(initial, goal, frontier)
 
-        # Add the initial state to the queue:
-        self._queue.append(self.initial)
+class DFSolver(Generic[TState], Solver[TState]):
+    """ Here we have a DFS solver """
+    def __init__(self, initial: TState, goal: TGoal) -> None:
+        frontier: Frontier = StackFrontier()
 
-        # Start dequeueing:
-        while len(self._queue) > 0:
-            # Get item from queue:
-            curr = self._queue.popleft()
+        super().__init__(initial, goal, frontier)
 
-            # Check if not in expanded:
-            if curr in self._expanded_list:
-                continue
+#
+# Leaving this here just because of the sentimental values:
+#
 
-            # Check if it is terminal
-            if curr.is_terminal(goal=self.goal):
-                self.solution = curr
-                self._expanded_list.append(curr)
-                break
+# class BFSolver(Generic[TState]):
+#     initial: TState
+#     _queue: Deque[TState]
+#     _expanded_list: List[TState]
+#     goal: TGoal
+#     already_run: bool = False
+#     solution: Optional[TState] = None
+
+#     def __init__(self, initial: TState, goal: TGoal) -> None:
+#         self._queue = deque()
+#         self._expanded_list = []
+#         self.initial = initial
+#         self.goal = goal
+
+#     def solve(self) -> Optional[TState]:
+#         assert self.already_run == False
+#         self.already_run = True
+
+#         # Add the initial state to the queue:
+#         self._queue.append(self.initial)
+
+#         # Start dequeueing:
+#         while len(self._queue) > 0:
+#             # Get item from queue:
+#             curr = self._queue.popleft()
+
+#             # Check if not in expanded:
+#             if curr in self._expanded_list:
+#                 continue
+
+#             # Check if it is terminal
+#             if curr.is_terminal(goal=self.goal):
+#                 self.solution = curr
+#                 self._expanded_list.append(curr)
+#                 break
             
-            # If not terminal, enqueue children:
-            self._expanded_list.append(curr)
+#             # If not terminal, enqueue children:
+#             self._expanded_list.append(curr)
 
-            for succ in curr.successor(): # type: TState
-                if succ not in self._queue:
-                    self._queue.append(succ)
+#             for succ in curr.successor(): # type: TState
+#                 if succ not in self._queue:
+#                     self._queue.append(succ)
 
-        return self.solution
+#         return self.solution
