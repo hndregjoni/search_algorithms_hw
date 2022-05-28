@@ -54,6 +54,7 @@ class QueueFrontier(Generic[TState], Frontier[TState, Deque[TState]]):
         
 
 zero = lambda _: 0
+uniform_distance = lambda s: s.last.distance + 1 if s.last is not None else s.distance
 
 class PriorityQueeFrontier(Generic[TState], Frontier[TState, List[TState]]):
     # f: Callable[[TState], int]
@@ -65,6 +66,9 @@ class PriorityQueeFrontier(Generic[TState], Frontier[TState, List[TState]]):
         self.h = h
     
     def add_to_frontier(self, state: TState):
+        # New distance
+        state.distance = self.g(state)
+        # New total cost
         state.cost = self.g(state) + self.h(state)
 
         heapq.heappush(self._frontierColl, state)
@@ -74,17 +78,8 @@ class PriorityQueeFrontier(Generic[TState], Frontier[TState, List[TState]]):
     
     def remove_from_frontier(self, state: Optional[TState] = None) -> None:
         # Simply pop
-        if state is not None:
-            k: int
-            found: int
-            v: TState
-            for k, v in enumerate(self._frontierColl): 
-                if v is state:
-                    found = k
-            
-            del self._frontierColl[found]
 
-            heapq.heapify(self._frontierColl)
+        heapq.heappop(self._frontierColl)
         
 
 class StackFrontier(Generic[TState], Frontier[TState, Deque[TState]]):

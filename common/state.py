@@ -1,5 +1,5 @@
+from typing import ClassVar, TypeVar, Generic, Iterator, Optional, Union, Type, Any, Callable, List, Tuple
 from copy import deepcopy
-from typing import ClassVar, TypeVar, Generic, Iterator, Optional, Union, Type, Any, Callable, List, cast
 
 TInnerState = TypeVar('TInnerState')
 TState = TypeVar('TState', bound='State')
@@ -15,6 +15,7 @@ class State(Generic[TInnerState]):
     terminal: bool = False
 
     # To be used for holding heuristics
+    distance: int = 0
     cost: int = 0
 
     def __lt__(self, other: Any):
@@ -53,6 +54,52 @@ class State(Generic[TInnerState]):
 TGridStateCell = TypeVar('TGridStateCell')
 TGrid = List[List[TGridStateCell]]
 
+GridCoord = Tuple[int, int]
+
+def manhattan_from(target: 'GridState[int]', memoize: bool = True) -> Callable[['GridState[int]'], int]:
+    """ This creates a Manhattan distance heuristic from the given target """
+
+    locate = target.locate
+    if memoize:
+        from functools import cache
+        locate = cache(locate)
+
+    def manhattan(state: 'GridState[int]') -> int:
+        s = 0
+        for i in range(state.w):
+            for j in range(state.h):
+                v = state[(i,j)]
+                if v == 0: continue
+
+                t_i, t_j = locate(v)
+
+                s += abs(i-t_i) + abs(j-t_j)
+
+        return s
+ 
+    return manhattan
+
+def off_from(target: 'GridState[int]', memoize: bool = True) -> Callable[['GridState[int]'], int]:
+    """ This creates a Manhattan distance heuristic from the given target """
+
+    locate = target.locate
+    if memoize:
+        from functools import cache
+        locate = cache(locate)
+
+    def off(state: 'GridState[int]') -> int:
+        s = 0
+        for i in range(state.w):
+            for j in range(state.h):
+                v = state[(i,j)]
+                if v == 0: continue
+                s += 1 if v != target[(i,j)] else 0
+
+        return s
+ 
+    return off
+ 
+
 class GridState(Generic[TGridStateCell], State[TGrid[TGridStateCell]]):
     def __init__(self, array: TGrid, label: str = "", last: Optional['GridState'] = None) -> None:
         super().__init__(array, label, last)
@@ -74,11 +121,25 @@ class GridState(Generic[TGridStateCell], State[TGrid[TGridStateCell]]):
                 res += empty_line
             
             for col_num in range(self.w):
-                res += f"{'1' if self._state[col_num][line_num] else '0'} "
+                res += f"{self._state[col_num][line_num]} "
             
             res += "\n"
         
         return res
+
+    def locate(self, val: TGridStateCell) -> GridCoord:
+        for i in range(self.w):
+            for j in range(self.h):
+                if self._state[i][j] == val:
+                    return (i, j)
+        
+        raise Exception(f"Value not found {val}")
+    
+    def __getitem__(self, key: GridCoord):
+        return self._state[key[0]][key[1]]
+    
+    def __setitem__(self, key: GridCoord, val: TGridStateCell):
+        self._state[key[0]][key[1]] = val
     
     def __eq__(self, __o: Any) -> bool:
         return self._state == __o._state
