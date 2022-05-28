@@ -25,19 +25,19 @@ class FlipState(GridState[int]):
      
     def flip(self, i: int, j: int):
         """ Flip around (i,j) """
-        self._state[i][j] = not self._state[i][j]
+        self._state[i][j] = 1^self._state[i][j]
 
         if self.h > j-1 >= 0:
-            self._state[i][j-1] = not self._state[i][j-1]
+            self._state[i][j-1] = 1^self._state[i][j-1]
         
         if self.w > i+1 >= 0:
-            self._state[i+1][j] = not self._state[i+1][j]
+            self._state[i+1][j] = 1^self._state[i+1][j]
 
         if self.h > j+1 >= 0:
-            self._state[i][j+1] = not self._state[i][j+1]
+            self._state[i][j+1] = 1^self._state[i][j+1]
 
         if self.w > i-1 >= 0:
-            self._state[i-1][j] = not self._state[i-1][j]
+            self._state[i-1][j] = 1^self._state[i-1][j]
 
 
 def read_from_open_file(f: TextIOWrapper) -> FlipState:

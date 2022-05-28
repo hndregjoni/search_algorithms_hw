@@ -4,7 +4,7 @@ from .solution import *
 from common.solvers import BFSolver, Solver, UniformCostSolver
 from common.frontiers import PriorityQueeFrontier, QueueFrontier, StackFrontier, uniform_distance
 
-goal = FlipState([[True]*3]*3, label = 'G')
+goal = FlipState([[1]*3]*3, label = 'G')
 
 def exercise1(argv: List[str]):
     initial = read_from_file("exercise1/input.txt")
