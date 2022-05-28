@@ -50,6 +50,9 @@ class State(Generic[TInnerState]):
     def copy(self: TState, new_label: str) -> 'TState':
         pass
 
+    def __eq__(self, __o: Any) -> bool:
+        return self._state == __o._state
+
 
 TGridStateCell = TypeVar('TGridStateCell')
 TGrid = List[List[TGridStateCell]]
@@ -139,7 +142,4 @@ class GridState(Generic[TGridStateCell], State[TGrid[TGridStateCell]]):
         return self._state[key[0]][key[1]]
     
     def __setitem__(self, key: GridCoord, val: TGridStateCell):
-        self._state[key[0]][key[1]] = val
-    
-    def __eq__(self, __o: Any) -> bool:
-        return self._state == __o._state
+        self._state[key[0]][key[1]] = val 

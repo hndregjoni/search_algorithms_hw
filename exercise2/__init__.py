@@ -7,6 +7,7 @@ from .solution import *
 from common.solvers import AStarSolver, BFSolver, Solver, UniformCostSolver
 from common.frontiers import PriorityQueeFrontier, QueueFrontier, StackFrontier, uniform_distance
 
+# This is transposed, to allow for [i][j] coordinate
 goal = FifteenState(
     [[1 , 5 , 9 , 13],
      [2 , 6 , 10, 14],
@@ -23,7 +24,7 @@ off_heuristic = off_from(goal)
 def exercise2(argv: List[str]):
     initial = read_from_file("exercise2/input.txt")
 
-    solver = AStarSolver(initial, goal, uniform_distance, off_heuristic)
+    solver = AStarSolver(initial, goal, uniform_distance, manhattan_heuristic)
 
     result = solver.solve()
 

@@ -7,6 +7,7 @@ from .frontiers import PriorityQueeFrontier, QueueFrontier, StackFrontier, TFron
 class Solver(Generic[TState]):
     _frontier: Frontier[TState, Any]
     already_run: bool = False
+    solution: Optional[TState] = None
 
     def __init__(self, initial: TState, goal: TGoal, frontier: Frontier[TState, Any]) -> None:
         self._frontier = frontier
@@ -30,9 +31,9 @@ class Solver(Generic[TState]):
             # print(curr.last.cost if curr.last is not None else 0)
             # print("")
             # print(curr)
-            print()
-            print(curr.distance)
-            print(curr.cost)
+            # print()
+            # print(curr.distance)
+            # print(curr.cost)
             # print(f"Current expanded: {len(self._frontier._expanded_list)}")
             # print(f"Current frontier: {len(self._frontier._frontierColl)}")
             # print("")
