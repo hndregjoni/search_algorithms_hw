@@ -1,5 +1,5 @@
 import threading
-from typing import Callable, Any
+from typing import Callable, Any, Iterator
 import math
 from math import floor, ceil
 from PIL import Image, ImageDraw, ImageFont
@@ -9,7 +9,7 @@ from .solution import HexMazeState
 sixty = math.radians(60)
 thirty = math.radians(30)
 
-def hexagon_points(x: float, y: float, edge_length: float) -> None:
+def hexagon_points(x: float, y: float, edge_length: float) -> Iterator[float]:
     for angle in range(0, 360, 60):
         yield x + math.cos(math.radians(angle + 30))*edge_length
         yield y + math.sin(math.radians(angle + 30))*edge_length

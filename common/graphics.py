@@ -1,5 +1,7 @@
-from typing import Any, TypeVar, Callable
-from .state import GridState
+from typing import Any, TypeVar, Callable, Generic, List
+from .state import GridState, TState
+from .solvers import Solver
+
 from PIL import Image, ImageDraw, ImageFont
 
 def draw_rectangle(im: Image, i: int, j: int, rec_dim: float):
@@ -20,11 +22,11 @@ def draw_centered_text(im: Image, content: str, x, y, fill=None) -> None:
     draw = ImageDraw.Draw(im)
 
     w,h = draw.textsize(content)
-    draw.text((x - w/2,y - y/2), content, fill="#000", anchor='mm')
+    draw.text((x - w/2,y - h/2), content, fill="#000", anchor='mm')
 
 
 TDrawContent = TypeVar('TDrawContent')
-def draw_grid_state(state: GridState[TDrawContent], rec_dim: float = 50, str_map: Callable[[TDrawContent], str] = str) -> Image:
+def draw_grid_state(state: GridState[TDrawContent], rec_dim: float = 50, str_map: Callable[[TDrawContent], str] = str) -> Image.Image:
     grid = state._state
 
     w: int = len(grid)

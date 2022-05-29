@@ -4,10 +4,12 @@ from collections import deque
 from .state import TState, TGoal, State
 from .frontiers import PriorityQueeFrontier, QueueFrontier, StackFrontier, TFrontier, Frontier, zero
 
+SolverCallback = Optional[Callable[['Solver', TState],None]]
 class Solver(Generic[TState]):
     _frontier: Frontier[TState, Any]
     already_run: bool = False
     solution: Optional[TState] = None
+    callback: SolverCallback = None
 
     def __init__(self, initial: TState, goal: TGoal, frontier: Frontier[TState, Any]) -> None:
         self._frontier = frontier
@@ -48,6 +50,9 @@ class Solver(Generic[TState]):
             if curr.is_terminal(goal=self.goal):
                 self.solution = curr
                 self._frontier.add_to_expanded(curr)
+
+                if self.callback is not None:
+                    self.callback(self, curr)
                 break
             
             # If not terminal, enqueue children:
@@ -57,8 +62,10 @@ class Solver(Generic[TState]):
 
             for succ in curr.successor():
                 if not self._frontier.been_expanded(succ):
-                    self._frontier.add_to_frontier(succ)
-            
+                    self._frontier.add_to_frontier(succ) 
+
+            if self.callback is not None:
+                self.callback(self, curr)
 
         return self.solution
 

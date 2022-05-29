@@ -1,11 +1,23 @@
-from typing import List
+from typing import List, Tuple
+from PIL.Image import Image
 
-from common.state import manhattan_from, off_from, print_forward_solution
-
+from common.graphics import draw_grid_state
+from common.state import forward_solution, manhattan_from, off_from, print_forward_solution
 from .solution import *
 
 from common.solvers import AStarSolver, BFSolver, Solver, UniformCostSolver
 from common.frontiers import PriorityQueeFrontier, QueueFrontier, StackFrontier, uniform_distance
+
+def run_with_snapshots(solver: Solver[FifteenState]) -> Tuple[Optional[FifteenState], List[Image]]:
+    images: List[Image] = []
+
+    result = solver.solve()
+
+    steps = forward_solution(result)
+    for step in steps:
+        images.append(draw_grid_state(step))
+    
+    return result, images
 
 # This is transposed, to allow for [i][j] coordinate
 goal = FifteenState(
@@ -49,6 +61,7 @@ def exercise2(argv: List[str]):
 
     solver = AStarSolver(initial, goal, uniform_distance, manhattan_heuristic)
 
-    result = solver.solve()
+    return run_with_snapshots(solver)
+    # result = solver.solve()
 
-    print_forward_solution(result)
+    # print_forward_solution(result)

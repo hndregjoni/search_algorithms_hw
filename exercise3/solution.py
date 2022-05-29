@@ -1,4 +1,4 @@
-from typing import NewType, List, Optional, Iterator, Tuple, cast, Callable
+from typing import NewType, List, Optional, Iterator, Tuple, cast, Callable, Any
 
 from io import TextIOWrapper
 from copy import deepcopy
@@ -95,6 +95,11 @@ class HexMazeState(State[HexPosition]):
     
     def __setitem__(self, key: GridCoord, val: Tile) -> None:
         self.maze[key[0]][key[1]] = val
+    
+    def __eq__(self, __o: Any) -> bool:
+        if (isinstance(__o, tuple)):
+            return self._state == __o
+        return super().__eq__(__o)
     
     def copy(self, new_label: str) -> 'HexMazeState':
         return HexMazeState(deepcopy(self._state), self.maze, new_label, self)
