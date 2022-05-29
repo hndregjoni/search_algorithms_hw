@@ -37,6 +37,7 @@ class Solver(Generic[TState]):
             # print(f"Current expanded: {len(self._frontier._expanded_list)}")
             # print(f"Current frontier: {len(self._frontier._frontierColl)}")
             # print("")
+            # input()
 
             # Check if not in expanded:
             if self._frontier.been_expanded(curr):
