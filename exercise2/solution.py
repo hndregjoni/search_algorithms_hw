@@ -4,7 +4,7 @@ from typing import Optional, Iterator
 from copy import deepcopy
 from common.read_util import lines_to_int_grid
 
-from common.state import GridState, TGrid, GridCoord
+from common.state import GridState, TGrid, GridCoord, TGoal
 
 class FifteenState(GridState[int]):
     """ 15-puzzle State """
@@ -62,7 +62,30 @@ class FifteenState(GridState[int]):
 
     def locate_blank(self) -> GridCoord:
         return self.locate(0)
+    
+    def get_inversions(self) -> int:
+        inversions = 0
 
+        N = self.w * self.h
+
+        for k in range(N):
+            k_j = k // self.w
+            k_i = k % self.w
+
+            at_k = self._state[k_i][k_j]
+
+            print(k_i, k_j, at_k)
+
+            for l in range(k+1, N):
+                l_j = l // self.w
+                l_i = l % self.h
+
+                at_l = self._state[l_i][l_j]
+
+                if at_k != 0 and at_l != 0 and at_k > at_l:
+                    inversions += 1
+        
+        return inversions
 
 def read_from_open_file(f: TextIOWrapper) -> FifteenState:
     stateArr: TGrid[int] = []
@@ -75,10 +98,3 @@ def read_from_open_file(f: TextIOWrapper) -> FifteenState:
 
 def read_from_file(path: str = "input.txt") -> FifteenState:
     return read_from_open_file(open(path))
-    
-def print_backwards(state: Optional[FifteenState]) -> None:
-    if state is None:
-        return
-    
-    print(state)
-    print_backwards(state.last)

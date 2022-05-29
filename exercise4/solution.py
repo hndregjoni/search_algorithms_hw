@@ -78,7 +78,7 @@ class UnblockState(State[List[Tile]]):
                         break
 
                 if path_clear:
-                    new_state: UnblockState = self.copy(f"{y} {x} {self.w-x} R") 
+                    new_state = self.copy(f"{y} {x} {self.w-x} R") 
                     new_state._state[0].coord = (y, self.w)
                     new_state.plot_board()
                     yield new_state
@@ -88,7 +88,7 @@ class UnblockState(State[List[Tile]]):
                 # Now we have a legitimate move, clone the tiles, and change this specific one
                 orig_coord, distance, direction, new_coord = legit_move
 
-                new_state: UnblockState = self.copy(f"{orig_coord[0]} {orig_coord[1]} {distance} {direction}")
+                new_state = self.copy(f"{orig_coord[0]} {orig_coord[1]} {distance} {direction}")
                 new_state._state[i].coord = new_coord
                 new_state.plot_board()
 
@@ -206,7 +206,7 @@ class UnblockState(State[List[Tile]]):
         return 0 <= y < self.h \
             and 0 <= x < self.w
 
-    def pp_board(self) -> None:
+    def pp_board(self) -> str:
         res = ""
         for line in self._board:
             for col in line:
@@ -266,10 +266,3 @@ def read_from_open_file(f: TextIOWrapper) -> UnblockState:
 
 def read_from_file(path: str = "exercise4/input3.txt") -> UnblockState:
     return read_from_open_file(open(path))
-
-def print_backwards(state: Optional[UnblockState]) -> None:
-    if state is None:
-        return
-    
-    print(state)
-    print_backwards(state.last)

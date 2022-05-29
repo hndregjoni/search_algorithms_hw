@@ -1,4 +1,5 @@
 from common.solvers import BFSolver
+from common.state import print_forward_solution
 from .solution import *
 
 def goal(state: UnblockState) -> bool:
@@ -14,4 +15,4 @@ def exercise4(argv: List[str]) -> None:
 
     result = solver.solve()
 
-    print_backwards(result)
+    print_forward_solution(result)

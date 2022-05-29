@@ -50,11 +50,4 @@ def read_from_open_file(f: TextIOWrapper) -> FlipState:
 
 
 def read_from_file(path: str = "input.txt") -> FlipState:
-    return read_from_open_file(open(path))
-    
-def print_backwards(state: Optional[FlipState]) -> None:
-    if state is None:
-        return
-    
-    print(state)
-    print_backwards(state.last)
+    return read_from_open_file(open(path)) 

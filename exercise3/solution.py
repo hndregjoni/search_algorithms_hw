@@ -1,4 +1,4 @@
-from typing import NewType, List, Optional, Iterator, Tuple, cast
+from typing import NewType, List, Optional, Iterator, Tuple, cast, Callable
 
 from io import TextIOWrapper
 from copy import deepcopy
@@ -66,7 +66,7 @@ class HexMazeState(State[HexPosition]):
             yield new_state
     
     @staticmethod
-    def grid_distance(coord1: GridCoord, coord2: GridCoord) -> int:
+    def grid_distance(coord1: HexPosition, coord2: HexPosition) -> int:
         dx: int
         dy: int
         dx = coord1[0] - coord1[0]
@@ -111,6 +111,12 @@ def empty_maze(w: int, h: int) -> HexGrid:
     return maze
 
 
+def hex_heuristic_to(goal: HexMazeState) -> Callable[[HexMazeState], int]:
+    def heuristic(state: HexMazeState) -> int:
+        return HexMazeState.grid_distance(state._state, goal._state)
+
+    return heuristic
+
 def read_from_open_file(f: TextIOWrapper) -> Tuple[HexMazeState, HexGrid, HexMazeState]:
     maze: HexGrid
 
@@ -142,10 +148,3 @@ def read_from_open_file(f: TextIOWrapper) -> Tuple[HexMazeState, HexGrid, HexMaz
 
 def read_from_file(path: str = "exercise3/input.txt") -> Tuple[HexMazeState, HexGrid, HexMazeState]:
     return read_from_open_file(open(path))
-
-def print_backwards(state: Optional[HexMazeState]) -> None:
-    if state is None:
-        return
-    
-    print(state)
-    print_backwards(state.last)

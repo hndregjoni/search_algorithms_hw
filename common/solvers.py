@@ -40,7 +40,7 @@ class Solver(Generic[TState]):
             # input()
 
             # Check if not in expanded:
-            if self._frontier.been_expanded(curr) or curr.is_solvable() == False:
+            if self._frontier.been_expanded(curr):
                 self._frontier.remove_from_frontier(curr)
                 continue
 

@@ -1,4 +1,4 @@
-from typing import ClassVar, TypeVar, Generic, Iterator, Optional, Union, Type, Any, Callable, List, Tuple
+from typing import ClassVar, TypeVar, Generic, Iterator, Optional, Union, Type, Any, Callable, List, Tuple, Sequence
 from copy import deepcopy
 
 TInnerState = TypeVar('TInnerState')
@@ -147,3 +147,23 @@ class GridState(Generic[TGridStateCell], State[TGrid[TGridStateCell]]):
     
     def __setitem__(self, key: GridCoord, val: TGridStateCell):
         self._state[key[0]][key[1]] = val 
+
+def backward_solution(state: Optional[State[Any]]) -> List[State[Any]]:
+    result: List[State[Any]] = []
+
+    while state is not None:
+        result.append(state)
+        state = state.last
+
+    return result
+
+def print_backward_backwards(state: Optional[State[Any]]) -> None:
+    for st in backward_solution(state):
+        print(st)
+
+def forward_solution(state: Optional[State[Any]]) -> List[State[Any]]:
+    return list(reversed(backward_solution(state)))
+
+def print_forward_solution(state: Optional[State[Any]]) -> None:
+    for st in forward_solution(state):
+        print(st)
