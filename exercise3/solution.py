@@ -37,23 +37,23 @@ class HexMazeState(State[HexPosition]):
 
         # Different behaviour whether current row is even or odd        
         if i % 2 == 0:
-            # If even, next row will have j indices: (j-1, j), and previous: (j, j+1)
+            # If even, the adjecent rows will have indices: (j, j+1)
             coords = [
                 (i-1, j+1),
                 (i-1, j  ),
                 (i  , j+1),
                 (i+1, j  ),
-                (i+1, j-1),
+                (i+1, j+1),
                 (i  , j-1)
             ]
         else:
-            # If odd, next row will have j indices: (j, j+1), and previous: (j-1, j)
+            # If odd, the adjecent rows will have indices: (j-1, j)
             coords = [
                 (i-1, j-1),
                 (i-1, j  ),
                 (i  , j+1),
                 (i+1, j  ),
-                (i+1, j+1),
+                (i+1, j-1),
                 (i  , j-1)
             ]
         

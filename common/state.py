@@ -47,6 +47,10 @@ class State(Generic[TInnerState]):
 
         return False
     
+    def is_solvable(self, goal: TGoal['State[TInnerState]'] = None) -> Optional[bool]:
+        """ Is the current state solvable ? """
+        return None
+    
     def copy(self: TState, new_label: str) -> 'TState':
         pass
 
