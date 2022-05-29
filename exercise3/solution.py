@@ -60,7 +60,7 @@ class HexMazeState(State[HexPosition]):
         for coord in filter(self.within, coords):
             if not self.empty_tile(coord): continue
 
-            new_state = self.copy(str(coord))
+            new_state = self.copy(f"{coord[0]} {coord[1]}")
             new_state._state = cast(HexPosition, coord)
 
             yield new_state
