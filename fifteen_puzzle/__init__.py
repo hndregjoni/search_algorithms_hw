@@ -62,7 +62,10 @@ def exercise2(path: str, algorithm: str, file: TextIOWrapper = None, gui: bool =
         initial = read_from_open_file(file)
 
     if not is_solvable(initial):
-        raise Exception("There is no solution for the given input.")
+        if gui:
+            return [], []
+        else:
+            return []
 
     algorithm = algorithm or "astar"
 
