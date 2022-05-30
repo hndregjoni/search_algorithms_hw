@@ -199,7 +199,7 @@ In this exercise, our goal is to free a tile in a 6x6 grid that is constrained b
 > First we have the number of state. Then we have the "S" state, followed by the legal tile moves, which contain the tile position, the distance moved, and the direction "U", "R", "D", "L"
 
 > **A\* heuristic**:
-> Number of unobstructed steps in the main tiles path towards the exit.
+> Number of unobstructed steps in the main tile's path towards the exit.
 
 ### Running on *input1.txt* with A\*:
 
