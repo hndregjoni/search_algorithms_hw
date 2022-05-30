@@ -1,3 +1,5 @@
+# Exercise 4
+
 from typing import List, TextIO, Tuple, Optional, cast
 
 from PIL.Image import Image

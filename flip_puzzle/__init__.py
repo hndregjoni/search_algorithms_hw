@@ -1,4 +1,5 @@
-from turtle import forward
+# Exercise 1
+
 from typing import List, Tuple, cast
 from urllib.request import ProxyBasicAuthHandler
 

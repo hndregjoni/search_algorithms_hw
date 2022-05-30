@@ -6,10 +6,10 @@ from sys import stdin, stdout
 
 from common.gui import SolutionDisplay
 
-from exercise1 import exercise1
-from exercise2 import exercise2
-from exercise3 import exercise3
-from exercise4 import exercise4
+from flip_puzzle import exercise1
+from fifteen_puzzle import exercise2
+from hex_maze import exercise3
+from unblock_puzzle import exercise4
 
 EXERCISES = {
     "1": (exercise1, True),
