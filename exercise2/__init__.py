@@ -5,7 +5,7 @@ from common.graphics import draw_grid_state
 from common.state import forward_solution, manhattan_from, off_from, print_forward_solution
 from .solution import *
 
-from common.solvers import AStarSolver, BFSolver, Solver, UniformCostSolver
+from common.solvers import AStarSolver, BFSolver, DFSolver, NoAlgorithmException, Solver, UniformCostSolver
 from common.frontiers import PriorityQueeFrontier, QueueFrontier, StackFrontier, uniform_distance
 
 def run_with_snapshots(solver: Solver[FifteenState]):
@@ -15,7 +15,7 @@ def run_with_snapshots(solver: Solver[FifteenState]):
 
     steps = forward_solution(result)
     for step in steps:
-        images.append(draw_grid_state(cast(FifteenState, step)))
+        images.append(draw_grid_state(cast(FifteenState, step), str_map=lambda s: str(s) if s != 0 else ""))
     
     return steps, images
 
@@ -53,7 +53,7 @@ off_heuristic = off_from(goal)
 # def quicker_manhattan_heuristic(state: GridState[int]) -> int:
 #     f
 
-def exercise2(path: str, file: TextIOWrapper = None, gui: bool = False):
+def exercise2(path: str, algorithm: str, file: TextIOWrapper = None, gui: bool = False):
     if path:
         initial = read_from_file(path)
     else:
@@ -62,7 +62,18 @@ def exercise2(path: str, file: TextIOWrapper = None, gui: bool = False):
     if not is_solvable(initial):
         raise Exception("There is no solution for the given input.")
 
-    solver = AStarSolver(initial, goal, uniform_distance, manhattan_heuristic)
+    algorithm = algorithm or "astar"
+
+    if algorithm == "bfs":
+        solver = BFSolver(initial, goal)
+    elif algorithm == "dfs":
+        solver == DFSolver(initial, goal)
+    elif algorithm == "uniform":
+        solver = UniformCostSolver(initial, goal, uniform_distance)
+    elif algorithm == "astar":
+        solver = AStarSolver(initial, goal, uniform_distance, manhattan_heuristic)
+    else:
+        raise NoAlgorithmException(algorithm)
 
     if gui:
         return run_with_snapshots(solver)

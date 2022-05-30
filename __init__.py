@@ -14,11 +14,12 @@ from exercise4 import exercise4
 EXERCISES = {
     "1": (exercise1, True),
     "2": (exercise2, True),
-    "3": (exercise3, True),
+    "3": (exercise3, False),
     "4": (exercise4, True)
 }
 
 def write_steps_to(out: TextIOWrapper, steps: List[str]):
+    out.write(str(len(steps)) + "\n")
     out.writelines(steps)
 
 def err(mess: str):
@@ -40,6 +41,8 @@ parser.add_argument('--input', type=str, required=False, help="Use the given fil
 parser.add_argument('--stdout', action="store_true", help="User stdout for output")
 parser.add_argument('--output', type=str, required=False, help="User the given file for output")
 
+parser.add_argument("--algorithm", type=str, help="Specify the algorithm (lfs, dfs, astar (with specified heuristic), uniform")
+
 if __name__ == "__main__":
     out_f: TextIOWrapper
 
@@ -47,6 +50,7 @@ if __name__ == "__main__":
 
     ex_args = {
         "gui": args.gui,
+        "algorithm": args.algorithm
     }
 
     if args.exercise not in EXERCISES:
@@ -78,8 +82,6 @@ if __name__ == "__main__":
 
         if len(steps) == 0:
             err("No solution")
-
-        print(len(steps), len(images))
         
         write_steps_to(out_f, steps)
 

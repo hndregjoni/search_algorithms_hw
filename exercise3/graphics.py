@@ -20,7 +20,7 @@ def draw_hexagon(im: Image, x: float, y: float, edge_length: float, fill: Any = 
 
     draw.polygon(list(hexagon_points(x,y, edge_length)), fill=fill, outline="#000", width=2)
 
-def draw_hexgrid_state(grid: HexMazeState, edge_length: float = 50, decide_fill: Callable[[int, int], Any] = lambda _1, _2: '#fff') -> Image:
+def draw_hexgrid_state(grid: HexMazeState, edge_length: float = 30, decide_fill: Callable[[int, int], Any] = lambda _1, _2: '#fff') -> Image:
     hex_grid = grid.maze
 
     # Half the length of a hexagon itselff

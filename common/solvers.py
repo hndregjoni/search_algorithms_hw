@@ -83,6 +83,8 @@ class DFSolver(Generic[TState], Solver[TState]):
 
         super().__init__(initial, goal, frontier)
 
+NoAlgorithmException = lambda alg: Exception(f"Algorithm  {alg} not expected")
+
 #
 # Leaving this here just because of the sentimental values:
 #

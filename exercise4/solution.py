@@ -1,6 +1,6 @@
 from io import TextIOWrapper
 from tkinter import W
-from typing import Sequence, Any, List, Optional, Iterator, Tuple
+from typing import Sequence, Any, List, Optional, Iterator, Tuple, Callable
 
 from copy import deepcopy
 from dataclasses import dataclass
@@ -263,6 +263,17 @@ def read_from_open_file(f: TextIOWrapper) -> UnblockState:
     
     return UnblockState(tiles, label="S")
 
+def free_space_heuristic(state: UnblockState) -> int:
+    main_tile = state._state[0]
+
+    row, col = main_tile.coord
+
+    for i in range(0, state.w):
+        new_row = row
+        new_col = col + main_tile.length + i
+
+        if not state.within_and_empty:
+            return i
 
 def read_from_file(path: str) -> UnblockState:
     return read_from_open_file(open(path))

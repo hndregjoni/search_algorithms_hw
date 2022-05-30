@@ -1,41 +1,51 @@
+from tkinter import filedialog
 from typing import List, Optional
 
-from threading import Thread
+from threading import Thread, Event
 
-from tkinter import Tk, RIGHT, BOTH, RAISED, CENTER, IntVar, LEFT, Canvas
+from tkinter import BOTTOM, Tk, RIGHT, BOTH, RAISED, CENTER, IntVar, LEFT, Canvas, E
+from tkinter.filedialog import FileDialog
 from tkinter.ttk import Frame, Button, Style, Scale, Label
 from PIL import ImageTk, Image
 from time import sleep
 
+
 class AnimationThead(Thread):
     variable: IntVar
-    running: bool = True
+    running: bool = False
     rate: int = 1
 
     min: int
     max: int
 
-    def __init__(self, variable: IntVar, min: int, max: int, interval: float = 1.2):
+    quit_event: Event
+
+    def __init__(self, variable: IntVar, min: int, max: int, interval: float = 1.5):
         super().__init__()
         self.variable = variable
         self.interval = interval
 
         self.min = min
         self.max = max
+
+        self.quit_event = Event()
     
     def run(self):
-        while True:
-            sleep(self.interval)
-            value = self.variable.get()
+        try:
+            while not self.quit_event.is_set():
+                sleep(self.interval)
+                value = self.variable.get()
 
-            if value == self.max:
-                self.rate = -1
-            
-            if value == self.min:
-                self.rate = 1
+                if value == self.max:
+                    self.rate = -1
+                
+                if value == self.min:
+                    self.rate = 1
 
-            if self.running:
-                self.variable.set(value+self.rate)
+                if self.running:
+                    self.variable.set(value+self.rate)
+        except Exception:
+            pass
 
 
 class SolutionDisplay(Frame):
@@ -43,20 +53,24 @@ class SolutionDisplay(Frame):
     W: int
     H: int
 
+    animation_thread: AnimationThead
+
     solutions: Optional[List[str]]
     images: List[Image.Image]
 
     scroll_var: IntVar
-    animation_thread: Thread
 
     #Labels
     progress_label: Label
     action_label: Label 
 
+    animate_button: Button
+
     def __init__(self, solutions: Optional[List[str]], images: List[Image.Image]):
         super().__init__()
 
         self.solutions = solutions
+        self._pil_images = images
         self.images = [*map(ImageTk.PhotoImage, images)]
 
         self.W = self.images[0].width()
@@ -71,12 +85,30 @@ class SolutionDisplay(Frame):
 
         self.initUI()
     
+    def quit(self):
+        if self.animation_thread is not None:
+            self.animation_thread.quit_event.set()
+    
     def toggle_animation(self, *args):
         if self.animation_thread is None:
             self.animation_thread = AnimationThead(self.scroll_var, 1, self.N)
             self.animation_thread.start()
-        elif self.animation_thread is not None:
-            self.animation_thread.running ^= True    
+
+        if self.animation_thread is not None:
+            val = self.animation_thread.running
+            val ^= True
+            self.animation_thread.running = val
+
+            if val:
+                self.animate_button.config(text="Stop")
+            else:
+                self.animate_button.config(text="Animate")
+            
+    def save(self, *action):
+        curr = self.scroll_var.get()
+        path = filedialog.asksaveasfilename(filetypes=[("PNG", ".png"), ("JPEG", ".jpg")])
+        if path is not None and len(path) > 0:
+            self._pil_images[curr-1].save(path)
     
     def change_step(self, n):
         self.progress_label.config(text=f"{n}/{self.N}")
@@ -92,6 +124,25 @@ class SolutionDisplay(Frame):
     def trace_scroll(self, *args):
         val = self.scroll_var.get()
         self.change_step(val)
+    
+    def speed_event(self, change):
+        def callback(*args):
+            if self.animation_thread is None:
+                return
+
+            interval = self.animation_thread.interval
+            interval = max(min(interval + change*0.2, 3), .2)
+            self.animation_thread.interval = interval
+        
+        return callback
+    
+    def next_event(self, step):
+        def callback(*args):
+            st = self.scroll_var.get()
+            st += step
+            self.scroll_var.set(st)
+        
+        return callback
 
     def initUI(self):
 
@@ -110,8 +161,31 @@ class SolutionDisplay(Frame):
         self.scroll_var = scroll_var = IntVar(value=1)
         scroll_var.trace('w', self.trace_scroll)
 
-        animate_button = Button(self, text="Animate")
-        animate_button.pack(side=RIGHT, padx=5, pady=5)
+        buttons_frame = Frame(self, borderwidth=1)
+        buttons_frame.pack(side=RIGHT)
+        #Down
+        down_button = Button(buttons_frame, text="🠗", width=2)
+        down_button.grid(row=0, column=0, padx=5, pady=5)
+        down_button.bind('<Button-1>', self.speed_event(-1))
+        #Animate
+        self.animate_button = animate_button = Button(buttons_frame, text="Animate")
+        animate_button.grid(row=0, column=1, sticky='news', padx=5, pady=5)
+        #Up
+        up_button = Button(buttons_frame, text="🠕", width=2)
+        up_button.grid(row=0, column=2, padx=5, pady=5)
+        up_button.bind('<Button-1>', self.speed_event(-1))
+        #Left
+        left_button = Button(buttons_frame, text="🠔", width=2)
+        left_button.grid(row=1, column=0, padx=5, pady=5)
+        left_button.bind('<Button-1>', self.next_event(-1))
+        #Save
+        save_button = Button(buttons_frame, text="Save")
+        save_button.grid(row=1, column=1, sticky='news', padx=5, pady=5)
+        save_button.bind('<Button-1>', self.save)
+        #Right
+        right_button = Button(buttons_frame, text="🠖", width=2)
+        right_button.grid(row=1, column=2, padx=5, pady=5)
+        right_button.bind('<Button-1>', self.next_event(1))
 
         scale = Scale(self, variable = scroll_var, from_=1, to=self.N)
         scale.pack(anchor=CENTER, padx=5, pady=5, fill="both")
