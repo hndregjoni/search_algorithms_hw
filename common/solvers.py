@@ -28,18 +28,6 @@ class Solver(Generic[TState]):
         while len(self._frontier) > 0:
             # Get item from queue:
             curr = self._frontier.peek_frontier()
-            # print("====")
-            # print(curr.last)
-            # print(curr.last.cost if curr.last is not None else 0)
-            # print("")
-            # print(curr)
-            # print()
-            # print(curr.distance)
-            # print(curr.cost)
-            # print(f"Current expanded: {len(self._frontier._expanded_list)}")
-            # print(f"Current frontier: {len(self._frontier._frontierColl)}")
-            # print("")
-            # input()
 
             # Check if not in expanded:
             if self._frontier.been_expanded(curr):

@@ -4,12 +4,12 @@ from PIL.Image import Image
 
 from common.solvers import AStarSolver, BFSolver, Solver
 from common.frontiers import uniform_distance
-from common.state import print_forward_solution
+from common.state import forward_solution, print_forward_solution
 
 from .solution import *
 from .graphics import draw_hexgrid_state
 
-def is_ancestor(child: HexMazeState, alleged: HexPosition):
+def is_ancestor(child: Optional[HexMazeState], alleged: HexPosition):
     """ Checks whether a state is ancestor of another """
     if child is None:
         return False
@@ -19,7 +19,7 @@ def is_ancestor(child: HexMazeState, alleged: HexPosition):
     
     return is_ancestor(child.last, alleged)
 
-def run_with_snapshots(solver: Solver[HexMazeState]) -> Tuple[Optional[HexMazeState], List[Image]]:
+def run_with_snapshots(solver: Solver[HexMazeState]):
     images: List[Image] = []
 
     def callback(_solver: Solver[HexMazeState], state: HexMazeState):
@@ -67,19 +67,21 @@ def run_with_snapshots(solver: Solver[HexMazeState]) -> Tuple[Optional[HexMazeSt
 
     result = solver.solve()
 
-    return result, images
+    return forward_solution(result), images
 
-def exercise3(argv: List[str]) -> None:
-    initial, maze, goal = read_from_file()
+def exercise3(path: str, file: TextIOWrapper = None, gui: bool = False):
+    if path:
+        initial, maze, goal = read_from_file(path)
+    else:
+        initial, maze, goal = read_from_open_file(file)
+
 
     heuristic = hex_heuristic_to(goal)
 
     solver = AStarSolver(initial, goal, uniform_distance, heuristic)
 
-    result, images = run_with_snapshots(solver)
-
-    return result, images
-
-    # result = solver.solve()
-
-    # print_forward_solution(result)
+    if gui:
+        return run_with_snapshots(solver)
+    else:
+        result = solver.solve()
+        return forward_solution(result)

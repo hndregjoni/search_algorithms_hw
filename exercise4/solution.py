@@ -216,7 +216,7 @@ class UnblockState(State[List[Tile]]):
         return res
     
     def __repr__(self) -> str:
-        return self.label + "\n" + self.pp_board()
+        return self.label 
     
     def empty(self, coord: GridCoord) -> bool:
         if not self.within(coord): return True
@@ -264,5 +264,5 @@ def read_from_open_file(f: TextIOWrapper) -> UnblockState:
     return UnblockState(tiles, label="S")
 
 
-def read_from_file(path: str = "exercise4/input3.txt") -> UnblockState:
+def read_from_file(path: str) -> UnblockState:
     return read_from_open_file(open(path))

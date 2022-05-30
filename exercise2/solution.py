@@ -74,8 +74,6 @@ class FifteenState(GridState[int]):
 
             at_k = self._state[k_i][k_j]
 
-            print(k_i, k_j, at_k)
-
             for l in range(k+1, N):
                 l_j = l // self.w
                 l_i = l % self.h

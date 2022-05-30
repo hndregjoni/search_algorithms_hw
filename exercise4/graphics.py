@@ -8,7 +8,7 @@ TILE_AREA = "#6A491E"
 TILE = "#DE7500"
 MAIN_TILE = "#DB0000"
 
-def create_image(rows: int, columns: int, edge_size: int, border: int) -> Image:
+def create_image(rows: int, columns: int, edge_size: float, border: int) -> Image:
     width = 2*border + columns * edge_size
     height = 2*border + rows * edge_size
 

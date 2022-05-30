@@ -114,7 +114,7 @@ class GridState(Generic[TGridStateCell], State[TGrid[TGridStateCell]]):
         self.w = len(self._state)
         self.h = len(self._state[0])
 
-    def __repr__(self):
+    def pretty_print(self):
         res = f""
 
         l = len(self.label)
@@ -131,8 +131,9 @@ class GridState(Generic[TGridStateCell], State[TGrid[TGridStateCell]]):
                 res += f"{self._state[col_num][line_num]} "
             
             res += "\n"
-        
-        return res
+
+    def __repr__(self):
+        return self.label
 
     def locate(self, val: TGridStateCell) -> GridCoord:
         for i in range(self.w):

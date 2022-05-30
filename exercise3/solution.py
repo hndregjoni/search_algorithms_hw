@@ -88,7 +88,7 @@ class HexMazeState(State[HexPosition]):
         return self[coord] == Tile.EMPTY
 
     def __repr__(self) -> str:
-        return str(self._state)
+        return self.label
      
     def __getitem__(self, key: GridCoord) -> Tile:
         return self.maze[key[0]][key[1]]
@@ -151,5 +151,5 @@ def read_from_open_file(f: TextIOWrapper) -> Tuple[HexMazeState, HexGrid, HexMaz
             HexMazeState(goal_coord, maze, "G")
 
 
-def read_from_file(path: str = "exercise3/input.txt") -> Tuple[HexMazeState, HexGrid, HexMazeState]:
+def read_from_file(path: str) -> Tuple[HexMazeState, HexGrid, HexMazeState]:
     return read_from_open_file(open(path))

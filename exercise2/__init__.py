@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, cast
 from PIL.Image import Image
 
 from common.graphics import draw_grid_state
@@ -8,16 +8,16 @@ from .solution import *
 from common.solvers import AStarSolver, BFSolver, Solver, UniformCostSolver
 from common.frontiers import PriorityQueeFrontier, QueueFrontier, StackFrontier, uniform_distance
 
-def run_with_snapshots(solver: Solver[FifteenState]) -> Tuple[Optional[FifteenState], List[Image]]:
+def run_with_snapshots(solver: Solver[FifteenState]):
     images: List[Image] = []
 
     result = solver.solve()
 
     steps = forward_solution(result)
     for step in steps:
-        images.append(draw_grid_state(step))
+        images.append(draw_grid_state(cast(FifteenState, step)))
     
-    return result, images
+    return steps, images
 
 # This is transposed, to allow for [i][j] coordinate
 goal = FifteenState(
@@ -53,15 +53,19 @@ off_heuristic = off_from(goal)
 # def quicker_manhattan_heuristic(state: GridState[int]) -> int:
 #     f
 
-def exercise2(argv: List[str]):
-    initial = read_from_file("exercise2/input.txt")
+def exercise2(path: str, file: TextIOWrapper = None, gui: bool = False):
+    if path:
+        initial = read_from_file(path)
+    else:
+        initial = read_from_open_file(file)
 
     if not is_solvable(initial):
         raise Exception("There is no solution for the given input.")
 
     solver = AStarSolver(initial, goal, uniform_distance, manhattan_heuristic)
 
-    return run_with_snapshots(solver)
-    # result = solver.solve()
-
-    # print_forward_solution(result)
+    if gui:
+        return run_with_snapshots(solver)
+    else:
+        result = solver.solve()
+        return forward_solution(result)

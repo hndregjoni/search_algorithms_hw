@@ -1,4 +1,5 @@
-from typing import List, Tuple
+from turtle import forward
+from typing import List, Tuple, cast
 from urllib.request import ProxyBasicAuthHandler
 
 from common.graphics import draw_grid_state
@@ -11,26 +12,28 @@ from PIL.Image import Image
 
 goal = FlipState([[1]*3]*3, label = 'G')
 
-def run_with_snapshots(solver: Solver[FlipState]) -> Tuple[Optional[FlipState], List[Image]]:
+def run_with_snapshots(solver: Solver[FlipState]):
     images: List[Image] = []
 
     result = solver.solve()
 
     steps = forward_solution(result)
     for step in steps:
-        images.append(draw_grid_state(step))
+        images.append(draw_grid_state(cast(FlipState, step)))
     
-    return result, images
+    return steps, images
 
-def exercise1(argv: List[str]):
-    initial = read_from_file("exercise1/input.txt")
+def exercise1(path: str, file: TextIOWrapper = None, gui: bool = False):
+    if path:
+        initial = read_from_file(path)
+    else:
+        initial = read_from_open_file(file)
 
     # solver = UniformCostSolver(initial, goal, uniform_distance)
     solver = Solver(initial, goal, QueueFrontier())
 
-    # result = solver.solve()
-
-    # print_forward_solution(result)
-
-    return run_with_snapshots(solver)
-
+    if gui:
+        return run_with_snapshots(solver)
+    else:
+        result = solver.solve()
+        return forward_solution(result)
