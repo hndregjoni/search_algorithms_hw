@@ -79,7 +79,7 @@ def exercise3(path: str, algorithm: str, file: TextIOWrapper = None, gui: bool =
     if algorithm == "bfs":
         solver = BFSolver(initial, goal)
     elif algorithm == "dfs":
-        solver == DFSolver(initial, goal)
+        solver = DFSolver(initial, goal)
     elif algorithm == "uniform":
         solver = UniformCostSolver(initial, goal, uniform_distance)
     elif algorithm == "astar":
