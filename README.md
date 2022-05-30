@@ -247,8 +247,6 @@ In this exercise, our goal is to free a tile in a 6x6 grid that is constrained b
 
 ### Running on *input3.txt* with A\*:
 
-> Hard!
-
 **GUI (start and goal)**
 
 ![Exercise 4, Input 3, Start](./images/ex4_in3_s.png)
